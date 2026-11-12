@@ -1,0 +1,22 @@
+{
+  "name": "hikma-jobtrack",
+  "version": "1.0.0",
+  "description": "Job Tracking Application with Candidate Applications and Admin Job Management",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "job-tracker",
+    "careers",
+    "recruitment",
+    "candidate-portal"
+  ],
+  "author": "Hikma Team",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.3.0",
+    "multer": "^2.5.0"
+  }
+}

@@ -1,0 +1,168 @@
+/* Hikma JobTrack - Modern Light Blue Theme */
+
+:root {
+  --primary-50: #f0f9ff;
+  --primary-100: #e0f2fe;
+  --primary-200: #bae6fd;
+  --primary-300: #7dd3fc;
+  --primary-400: #38bdf8;
+  --primary-500: #0ea5e9;
+  --primary-600: #0284c7;
+  --primary-700: #0369a1;
+  --primary-800: #075985;
+  --primary-900: #0c4a6e;
+  --primary-glow: rgba(14, 165, 233, 0.25);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Glassmorphism Accents */
+.glass-header {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.hero-gradient {
+  background: radial-gradient(circle at 10% 20%, rgba(224, 242, 254, 0.8) 0%, rgba(240, 249, 255, 0.5) 45%, rgba(255, 255, 255, 1) 90%);
+}
+
+.badge-light-blue {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.btn-primary-blue {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: #ffffff;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px 0 rgba(2, 132, 199, 0.3);
+}
+
+.btn-primary-blue:hover {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  box-shadow: 0 6px 20px 0 rgba(2, 132, 199, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-primary-blue:active {
+  transform: translateY(0);
+}
+
+.btn-outline-blue {
+  border: 1.5px solid #0284c7;
+  color: #0284c7;
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-blue:hover {
+  background-color: #f0f9ff;
+  border-color: #0369a1;
+  color: #0369a1;
+}
+
+/* Card hover glow */
+.job-card {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #e2e8f0;
+}
+
+.job-card:hover {
+  transform: translateY(-3px);
+  border-color: #7dd3fc;
+  box-shadow: 0 12px 28px -6px rgba(2, 132, 199, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
+}
+
+/* Drag and drop zone */
+.file-dropzone {
+  border: 2px dashed #93c5fd;
+  background-color: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.file-dropzone.dragover {
+  border-color: #0284c7;
+  background-color: #f0f9ff;
+  transform: scale(1.01);
+}
+
+/* Application Status Stepper */
+.stepper-track {
+  position: relative;
+}
+
+.stepper-track::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 24px;
+  right: 24px;
+  height: 3px;
+  background-color: #e2e8f0;
+  z-index: 1;
+}
+
+.step-node {
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.step-node.completed .step-circle {
+  background-color: #0284c7;
+  color: white;
+  border-color: #0284c7;
+}
+
+.step-node.active .step-circle {
+  background-color: white;
+  color: #0284c7;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
+}
+
+.step-node.rejected .step-circle {
+  background-color: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* Modal backdrop fade */
+.modal-overlay {
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+}
+

@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hikma JobTrack - Career Portal & Job Tracking</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Custom Light Blue Styles -->
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sky: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="glass-header sticky top-0 z-40 transition-all duration-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('candidate')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-sky-400 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+          <i class="fa-solid fa-briefcase text-lg"></i>
+        </div>
+        <div>
+          <span class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
+            Hikma <span class="text-sky-600 font-extrabold">JobTrack</span>
+          </span>
+          <span class="text-xs text-sky-700 block font-medium -mt-1">Careers & Talent Portal</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <button id="nav-btn-jobs" onclick="switchView('candidate')" class="text-sky-700 hover:text-sky-900 transition flex items-center gap-1.5 font-semibold">
+          <i class="fa-solid fa-list-check text-sky-500"></i> Explore Jobs
+        </button>
+        <button id="nav-btn-track" onclick="openTrackModal()" class="text-slate-600 hover:text-sky-600 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-magnifying-glass-location text-sky-500"></i> Track My Application
+        </button>
+      </nav>
+
+      <!-- View Switcher (Candidate vs Admin) -->
+      <div class="flex items-center gap-3">
+        <div class="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200 text-xs font-semibold">
+          <button id="view-toggle-candidate" onclick="switchView('candidate')" class="px-3 py-1.5 rounded-lg bg-white text-sky-700 shadow-sm transition flex items-center gap-1.5">
+            <i class="fa-solid fa-user"></i>
+            <span>Candidate</span>
+          </button>
+          <button id="view-toggle-admin" onclick="switchView('admin')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-sky-700 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Admin Portal</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- 1. CANDIDATE / PUBLIC VIEW -->
+  <!-- ======================================================== -->
+  <main id="candidate-view" class="flex-grow">
+    
+    <!-- Hero Section -->
+    <section class="hero-gradient border-b border-sky-100 pt-12 pb-14 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 border border-sky-200 text-sky-800 text-xs font-semibold uppercase tracking-wider mb-4 animate-fade-in">
+          <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+          Now Hiring Top Talent Worldwide
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+          Shape the Future of Technology at <span class="text-sky-600">Hikma</span>
+        </h1>
+        <p class="mt-4 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          Explore open engineering, product, design, and business roles. Apply in minutes with real-time application tracking.
+        </p>
+
+        <!-- Search & Filter Card -->
+        <div class="mt-8 bg-white p-4 sm:p-5 rounded-2xl shadow-xl shadow-sky-900/5 border border-sky-100 text-left">
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <!-- Keyword search -->
+            <div class="sm:col-span-5 relative">
+              <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+              <input type="text" id="filter-search" placeholder="Search by title, skills or keywords..." 
+                class="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition"
+                oninput="debounceSearch()">
+            </div>
+
+            <!-- Department dropdown -->
+            <div class="sm:col-span-3">
+              <select id="filter-department" onchange="loadJobs()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition">
+                <option value="all">All Departments</option>
+              </select>
+            </div>
+
+            <!-- Work type dropdown -->
+            <div class="sm:col-span-2">
+              <select id="filter-work-type" onchange="loadJobs()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition">
+                <option value="all">Work Type</option>
+                <option value="Remote">Remote</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="On-site">On-site</option>
+              </select>
+            </div>
+
+            <!-- Reset & Submit -->
+            <div class="sm:col-span-2 flex gap-2">
+              <button onclick="loadJobs()" class="w-full btn-primary-blue py-2.5 px-4 rounded-xl text-sm font-semibold flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-filter"></i> Filter
+              </button>
+            </div>
+          </div>
+
+          <!-- Secondary Filter Chips -->
+          <div class="mt-3.5 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="flex flex-wrap items-center gap-1.5" id="dept-pills-container">
+              <span class="text-slate-400 font-medium">Quick Filter:</span>
+              <button onclick="setDeptFilter('all')" class="dept-pill px-2.5 py-1 rounded-lg bg-sky-600 text-white font-medium transition" data-dept="all">All</button>
+              <button onclick="setDeptFilter('Engineering')" class="dept-pill px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700 font-medium transition" data-dept="Engineering">Engineering</button>
+              <button onclick="setDeptFilter('Design')" class="dept-pill px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700 font-medium transition" data-dept="Design">Design</button>
+              <button onclick="setDeptFilter('Infrastructure')" class="dept-pill px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700 font-medium transition" data-dept="Infrastructure">Infrastructure</button>
+              <button onclick="setDeptFilter('Marketing')" class="dept-pill px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700 font-medium transition" data-dept="Marketing">Marketing</button>
+              <button onclick="setDeptFilter('Data & AI')" class="dept-pill px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700 font-medium transition" data-dept="Data & AI">Data & AI</button>
+            </div>
+            <button onclick="resetFilters()" class="text-slate-400 hover:text-sky-600 transition flex items-center gap-1">
+              <i class="fa-solid fa-rotate-left"></i> Reset all
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Job Openings Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <!-- Section Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            Available Positions
+            <span id="job-count-badge" class="text-xs px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 font-semibold border border-sky-200">
+              Loading...
+            </span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">Showing verified active opportunities at Hikma</p>
+        </div>
+
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <label for="filter-experience" class="text-xs text-slate-500 font-medium hidden sm:inline">Experience:</label>
+          <select id="filter-experience" onchange="loadJobs()" class="text-xs px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+            <option value="all">All Experience Levels</option>
+            <option value="Entry Level">Entry Level</option>
+            <option value="Mid Level">Mid Level</option>
+            <option value="Senior Level">Senior Level</option>
+            <option value="Lead / Principal">Lead / Principal</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Jobs Grid -->
+      <div id="jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Loading State -->
+      <div id="jobs-loading" class="text-center py-16 hidden">
+        <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-sky-200 border-t-sky-600"></div>
+        <p class="text-slate-500 text-sm mt-3">Fetching openings...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div id="jobs-empty" class="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200 p-8 hidden">
+        <div class="w-16 h-16 rounded-full bg-sky-50 text-sky-500 mx-auto flex items-center justify-center text-2xl mb-4">
+          <i class="fa-solid fa-briefcase"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800">No matching jobs found</h3>
+        <p class="text-slate-500 text-sm mt-1 max-w-md mx-auto">We couldn't find any job openings matching your search criteria. Try adjusting or clearing your filters.</p>
+        <button onclick="resetFilters()" class="mt-4 px-4 py-2 rounded-xl btn-primary-blue text-sm font-semibold inline-flex items-center gap-2">
+          <i class="fa-solid fa-arrow-rotate-right"></i> Reset Filters
+        </button>
+      </div>
+    </section>
+
+    <!-- Why Work at Hikma Banner -->
+    <section class="bg-gradient-to-r from-sky-900 to-sky-800 text-white py-12 px-4 sm:px-6 lg:px-8 mt-12">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 text-center sm:text-left">
+        <div class="flex flex-col items-center sm:items-start">
+          <div class="w-12 h-12 rounded-xl bg-sky-700/60 flex items-center justify-center text-sky-200 text-xl mb-3">
+            <i class="fa-solid fa-globe"></i>
+          </div>
+          <h4 class="font-bold text-base text-white">Remote-First Culture</h4>
+          <p class="text-xs text-sky-200 mt-1 leading-relaxed">Work from anywhere with top-tier hardware stipends and asynchronous workflows.</p>
+        </div>
+        <div class="flex flex-col items-center sm:items-start">
+          <div class="w-12 h-12 rounded-xl bg-sky-700/60 flex items-center justify-center text-sky-200 text-xl mb-3">
+            <i class="fa-solid fa-coins"></i>
+          </div>
+          <h4 class="font-bold text-base text-white">Competitive Compensation</h4>
+          <p class="text-xs text-sky-200 mt-1 leading-relaxed">Transparent salary bands, equity participation, and bi-annual performance bonuses.</p>
+        </div>
+        <div class="flex flex-col items-center sm:items-start">
+          <div class="w-12 h-12 rounded-xl bg-sky-700/60 flex items-center justify-center text-sky-200 text-xl mb-3">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <h4 class="font-bold text-base text-white">Health & Wellness</h4>
+          <p class="text-xs text-sky-200 mt-1 leading-relaxed">Comprehensive insurance, mental health support, and flexible time-off policies.</p>
+        </div>
+        <div class="flex flex-col items-center sm:items-start">
+          <div class="w-12 h-12 rounded-xl bg-sky-700/60 flex items-center justify-center text-sky-200 text-xl mb-3">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <h4 class="font-bold text-base text-white">Continuous Learning</h4>
+          <p class="text-xs text-sky-200 mt-1 leading-relaxed">Dedicated $2,000 annual budget for courses, books, and international conferences.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- 2. ADMIN PORTAL VIEW -->
+  <!-- ======================================================== -->
+  <main id="admin-view" class="flex-grow hidden bg-slate-100">
+    <!-- Admin Header & Actions Bar -->
+    <div class="bg-white border-b border-slate-200 py-6 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 text-xs font-bold uppercase tracking-wider border border-sky-200">
+              Admin Portal
+            </span>
+            <span class="text-xs text-slate-500">Talent Acquisition Suite</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Recruitment Management</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Post openings, track applicant pipeline, review resumes, and manage candidates.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button onclick="exportCSV()" class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-file-csv text-emerald-600"></i> Export Applications (CSV)
+          </button>
+          <button onclick="openPostJobModal()" class="px-4 py-2 rounded-xl btn-primary-blue text-xs font-semibold flex items-center gap-2 shadow-sm">
+            <i class="fa-solid fa-plus"></i> Post New Job Opening
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin KPI Stats Cards -->
+      <div class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4 mt-6">
+        <!-- Card 1 -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div class="text-slate-500 text-xs font-medium flex items-center justify-between">
+            <span>Total Openings</span>
+            <i class="fa-solid fa-briefcase text-sky-500"></i>
+          </div>
+          <div id="stat-total-jobs" class="text-2xl font-extrabold text-slate-900 mt-1">--</div>
+          <div id="stat-active-jobs" class="text-xs text-sky-600 font-medium mt-0.5">-- Active</div>
+        </div>
+        <!-- Card 2 -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div class="text-slate-500 text-xs font-medium flex items-center justify-between">
+            <span>Applications</span>
+            <i class="fa-solid fa-users text-sky-500"></i>
+          </div>
+          <div id="stat-total-apps" class="text-2xl font-extrabold text-slate-900 mt-1">--</div>
+          <div class="text-xs text-slate-500 font-medium mt-0.5">All time submissions</div>
+        </div>
+        <!-- Card 3 -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div class="text-slate-500 text-xs font-medium flex items-center justify-between">
+            <span>Pending</span>
+            <i class="fa-solid fa-clock text-amber-500"></i>
+          </div>
+          <div id="stat-pending-apps" class="text-2xl font-extrabold text-amber-600 mt-1">--</div>
+          <div class="text-xs text-slate-500 font-medium mt-0.5">Awaiting first review</div>
+        </div>
+        <!-- Card 4 -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div class="text-slate-500 text-xs font-medium flex items-center justify-between">
+            <span>Shortlisted</span>
+            <i class="fa-solid fa-star text-sky-500"></i>
+          </div>
+          <div id="stat-shortlisted-apps" class="text-2xl font-extrabold text-sky-600 mt-1">--</div>
+          <div class="text-xs text-slate-500 font-medium mt-0.5">Qualified profiles</div>
+        </div>
+        <!-- Card 5 -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div class="text-slate-500 text-xs font-medium flex items-center justify-between">
+            <span>Interviews</span>
+            <i class="fa-solid fa-comments text-indigo-500"></i>
+          </div>
+          <div id="stat-interview-apps" class="text-2xl font-extrabold text-indigo-600 mt-1">--</div>
+          <div class="text-xs text-slate-500 font-medium mt-0.5">In assessment stage</div>
+        </div>
+        <!-- Card 6 -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div class="text-slate-500 text-xs font-medium flex items-center justify-between">
+            <span>Offered</span>
+            <i class="fa-solid fa-trophy text-emerald-500"></i>
+          </div>
+          <div id="stat-offered-apps" class="text-2xl font-extrabold text-emerald-600 mt-1">--</div>
+          <div class="text-xs text-slate-500 font-medium mt-0.5">Offers extended</div>
+        </div>
+      </div>
+
+      <!-- Admin Tabs Navigation -->
+      <div class="max-w-7xl mx-auto flex items-center gap-6 mt-6 border-b border-slate-200 text-sm font-semibold">
+        <button id="admin-tab-apps" onclick="switchAdminTab('applications')" class="pb-3 border-b-2 border-sky-600 text-sky-600 flex items-center gap-2">
+          <i class="fa-solid fa-address-book"></i> Candidate Applications
+        </button>
+        <button id="admin-tab-jobs" onclick="switchAdminTab('jobs')" class="pb-3 border-b-2 border-transparent text-slate-500 hover:text-sky-600 flex items-center gap-2">
+          <i class="fa-solid fa-briefcase"></i> Job Openings Management
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin Content Area -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      
+      <!-- SUB-TAB 1: APPLICATIONS & PIPELINE -->
+      <div id="admin-panel-applications">
+        <!-- Filter Controls -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+          <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <!-- Search candidate -->
+            <div class="relative w-full sm:w-64">
+              <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-xs"></i>
+              <input type="text" id="admin-filter-search" placeholder="Search applicant, email, code..."
+                class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:bg-white"
+                oninput="debounceAdminApps()">
+            </div>
+
+            <!-- Job filter -->
+            <select id="admin-filter-job" onchange="loadAdminApplications()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 text-slate-700">
+              <option value="all">All Jobs</option>
+            </select>
+
+            <!-- Status filter -->
+            <select id="admin-filter-status" onchange="loadAdminApplications()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 text-slate-700">
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="reviewing">Reviewing</option>
+              <option value="shortlisted">Shortlisted</option>
+              <option value="interview">Interview</option>
+              <option value="offered">Offered</option>
+              <option value="rejected">Rejected</option>
+              <option value="withdrawn">Withdrawn</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span id="admin-apps-count" class="text-xs text-slate-500 font-medium">0 candidates</span>
+            <button onclick="loadAdminApplications()" class="p-2 text-slate-500 hover:text-sky-600 transition rounded-lg hover:bg-slate-100" title="Refresh">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Applications Table Container -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-semibold">
+                <tr>
+                  <th class="px-4 py-3">Candidate</th>
+                  <th class="px-4 py-3">Job Applied</th>
+                  <th class="px-4 py-3">Experience</th>
+                  <th class="px-4 py-3">Tracking Code</th>
+                  <th class="px-4 py-3">Applied Date</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-applications-tbody" class="divide-y divide-slate-100">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+          <!-- Empty Table Message -->
+          <div id="admin-apps-empty" class="text-center py-12 hidden">
+            <i class="fa-solid fa-inbox text-3xl text-slate-300 mb-2"></i>
+            <p class="text-slate-500 font-medium text-sm">No applications found matching criteria.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 2: JOB OPENINGS MANAGEMENT -->
+      <div id="admin-panel-jobs" class="hidden">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Manage Job Postings</h3>
+            <p class="text-xs text-slate-500">Create, edit, toggle visibility, and monitor openings.</p>
+          </div>
+          <button onclick="openPostJobModal()" class="px-3.5 py-2 rounded-xl btn-primary-blue text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-plus"></i> Post New Job
+          </button>
+        </div>
+
+        <!-- Jobs Management Table -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-semibold">
+                <tr>
+                  <th class="px-4 py-3">Job Title & Dept</th>
+                  <th class="px-4 py-3">Location & Type</th>
+                  <th class="px-4 py-3">Salary Range</th>
+                  <th class="px-4 py-3">Applicants</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Deadline</th>
+                  <th class="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-jobs-tbody" class="divide-y divide-slate-100">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODALS & DIALOGS -->
+  <!-- ======================================================== -->
+
+  <!-- 1. JOB DETAILS MODAL -->
+  <div id="modal-job-details" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fade-in border border-sky-100">
+      <!-- Modal Header -->
+      <div class="p-6 bg-gradient-to-r from-sky-50 to-white border-b border-sky-100 flex items-start justify-between">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span id="detail-dept-badge" class="badge-light-blue px-2.5 py-0.5 rounded-full text-xs font-semibold">
+              Department
+            </span>
+            <span id="detail-type-badge" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+              Remote
+            </span>
+            <span id="detail-exp-badge" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+              Mid Level
+            </span>
+          </div>
+          <h3 id="detail-title" class="text-2xl font-bold text-slate-900 leading-snug">Senior Full-Stack Engineer</h3>
+          <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-2">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-building text-sky-500"></i> Hikma Solutions</span>
+            <span id="detail-location" class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-sky-500"></i> Remote</span>
+            <span id="detail-salary" class="flex items-center gap-1.5 font-semibold text-slate-700"><i class="fa-solid fa-money-bill-wave text-emerald-600"></i> $85k - $120k</span>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-job-details')" class="text-slate-400 hover:text-slate-600 transition p-1">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-6 overflow-y-auto space-y-6 text-sm text-slate-700">
+        <div>
+          <h4 class="font-bold text-slate-900 text-base mb-2">Role Overview</h4>
+          <p id="detail-description" class="text-slate-600 leading-relaxed whitespace-pre-line"></p>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-slate-900 text-base mb-2">Key Responsibilities</h4>
+          <ul id="detail-responsibilities" class="list-disc pl-5 space-y-1.5 text-slate-600"></ul>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-slate-900 text-base mb-2">Qualifications & Skills</h4>
+          <ul id="detail-requirements" class="list-disc pl-5 space-y-1.5 text-slate-600"></ul>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-slate-900 text-base mb-2">Benefits & Perks</h4>
+          <ul id="detail-benefits" class="list-disc pl-5 space-y-1.5 text-slate-600"></ul>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+        <span id="detail-deadline" class="text-xs text-slate-500 font-medium"></span>
+        <div class="flex gap-3">
+          <button onclick="closeModal('modal-job-details')" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-200 text-sm font-semibold transition">
+            Close
+          </button>
+          <button id="detail-apply-btn" onclick="openApplyModalFromDetail()" class="px-5 py-2 rounded-xl btn-primary-blue text-sm font-semibold flex items-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Apply for this Position
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. APPLICATION FORM MODAL -->
+  <div id="modal-apply" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-fade-in border border-sky-100">
+      <!-- Header -->
+      <div class="p-5 bg-gradient-to-r from-sky-50 to-white border-b border-sky-100 flex items-start justify-between">
+        <div>
+          <div class="text-xs font-semibold text-sky-700 uppercase tracking-wider">Submit Application</div>
+          <h3 id="apply-modal-job-title" class="text-xl font-bold text-slate-900 mt-0.5">Job Title</h3>
+          <p id="apply-modal-job-dept" class="text-xs text-slate-500"></p>
+        </div>
+        <button onclick="closeModal('modal-apply')" class="text-slate-400 hover:text-slate-600 transition p-1">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Form Body -->
+      <form id="form-application" onsubmit="handleApplicationSubmit(event)" class="p-6 overflow-y-auto space-y-4 text-xs">
+        <input type="hidden" id="apply-job-id" name="job_id">
+
+        <!-- Personal Info -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Full Name <span class="text-rose-500">*</span></label>
+            <input type="text" id="apply-name" name="applicant_name" required placeholder="e.g. Jane Doe"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Email Address <span class="text-rose-500">*</span></label>
+            <input type="email" id="apply-email" name="applicant_email" required placeholder="jane.doe@example.com"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Phone Number</label>
+            <input type="tel" id="apply-phone" name="applicant_phone" placeholder="+1 (555) 000-0000"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Your City / Location</label>
+            <input type="text" id="apply-location" name="location" placeholder="e.g. Casablanca, London, New York"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm">
+          </div>
+        </div>
+
+        <!-- Experience & Links -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Current / Recent Company</label>
+            <input type="text" id="apply-current-company" name="current_company" placeholder="e.g. TechCorp Inc."
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Years of Experience</label>
+            <input type="number" id="apply-experience" name="experience_years" min="0" max="40" value="3"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">LinkedIn Profile</label>
+            <input type="url" id="apply-linkedin" name="linkedin_url" placeholder="https://linkedin.com/in/username"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Portfolio / GitHub Website</label>
+            <input type="url" id="apply-portfolio" name="portfolio_url" placeholder="https://github.com/username"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm">
+          </div>
+        </div>
+
+        <!-- Resume File Upload -->
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Resume / CV (PDF, DOCX, TXT - max 15MB)</label>
+          <div id="dropzone" class="file-dropzone rounded-xl p-4 text-center cursor-pointer relative"
+               onclick="document.getElementById('apply-resume-input').click()">
+            <input type="file" id="apply-resume-input" name="resume" accept=".pdf,.doc,.docx,.txt" class="hidden" onchange="handleFileSelect(this)">
+            <div id="dropzone-prompt">
+              <i class="fa-solid fa-cloud-arrow-up text-2xl text-sky-500 mb-1"></i>
+              <p class="text-xs font-semibold text-slate-700">Click to upload or drag & drop resume</p>
+              <p class="text-[10px] text-slate-400">PDF, DOC, DOCX up to 15MB</p>
+            </div>
+            <div id="dropzone-fileinfo" class="hidden flex items-center justify-between bg-sky-50 p-2.5 rounded-lg border border-sky-200 text-left">
+              <div class="flex items-center gap-2 overflow-hidden">
+                <i class="fa-solid fa-file-pdf text-rose-500 text-lg"></i>
+                <div class="truncate">
+                  <span id="dropzone-filename" class="font-bold text-slate-800 text-xs block truncate">resume.pdf</span>
+                  <span id="dropzone-filesize" class="text-[10px] text-slate-500">240 KB</span>
+                </div>
+              </div>
+              <button type="button" onclick="clearSelectedFile(event)" class="text-slate-400 hover:text-rose-500 p-1">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cover Letter -->
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Cover Note / Why Hikma?</label>
+          <textarea id="apply-cover-letter" name="cover_letter" rows="3" placeholder="Briefly highlight why you're a great fit for this opening..."
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs"></textarea>
+        </div>
+
+        <!-- Form Error Notice -->
+        <div id="apply-error-msg" class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs hidden"></div>
+
+        <!-- Submit Button -->
+        <div class="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modal-apply')" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold transition">
+            Cancel
+          </button>
+          <button type="submit" id="btn-submit-apply" class="px-6 py-2.5 rounded-xl btn-primary-blue font-semibold flex items-center gap-2">
+            <span>Submit Application</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. APPLICATION SUCCESS MODAL -->
+  <div id="modal-success" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center animate-fade-in border border-sky-100">
+      <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-3xl mb-4 shadow-sm">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h3 class="text-xl font-bold text-slate-900">Application Submitted!</h3>
+      <p class="text-xs text-slate-500 mt-1">Your profile has been routed directly to our recruitment team.</p>
+
+      <!-- Tracking Code Box -->
+      <div class="mt-5 p-4 rounded-xl bg-sky-50 border border-sky-200 text-left">
+        <span class="text-[10px] font-bold text-sky-800 uppercase tracking-wider block">Your Application Tracking Code</span>
+        <div class="flex items-center justify-between mt-1">
+          <span id="success-tracking-code" class="text-2xl font-black text-sky-700 tracking-wider font-mono">HK-00000</span>
+          <button onclick="copyTrackingCode()" class="px-3 py-1.5 rounded-lg bg-white border border-sky-300 text-sky-700 text-xs font-semibold hover:bg-sky-100 transition flex items-center gap-1.5">
+            <i class="fa-regular fa-copy"></i> Copy
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-2">
+          Keep this code safe to check real-time review status, interviews, and feedback.
+        </p>
+      </div>
+
+      <div class="mt-6 flex flex-col gap-2">
+        <button onclick="trackFromSuccess()" class="w-full py-2.5 rounded-xl btn-primary-blue text-xs font-semibold flex items-center justify-center gap-2">
+          <i class="fa-solid fa-magnifying-glass-location"></i> Track This Application Now
+        </button>
+        <button onclick="closeModal('modal-success')" class="w-full py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold transition">
+          Return to Job Openings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. TRACK MY APPLICATION MODAL -->
+  <div id="modal-track" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fade-in border border-sky-100">
+      <!-- Header -->
+      <div class="p-5 bg-gradient-to-r from-sky-50 to-white border-b border-sky-100 flex items-start justify-between">
+        <div>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center text-sm">
+              <i class="fa-solid fa-satellite-dish"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-slate-900 leading-tight">Live Application Tracker</h3>
+              <p class="text-xs text-slate-500">Search by Tracking Code (e.g. HK-74912) or your Email Address</p>
+            </div>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-track')" class="text-slate-400 hover:text-slate-600 transition p-1">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Search Input Section -->
+      <div class="p-5 border-b border-slate-100 bg-slate-50/50">
+        <form onsubmit="handleTrackSearch(event)" class="flex gap-2">
+          <div class="relative flex-grow">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+            <input type="text" id="track-input" required placeholder="Enter Tracking Code (HK-XXXXX) or Email..."
+              class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500">
+          </div>
+          <button type="submit" class="px-5 py-2 rounded-xl btn-primary-blue text-xs font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-search"></i> Track
+          </button>
+        </form>
+      </div>
+
+      <!-- Results Container -->
+      <div id="track-results-container" class="p-5 overflow-y-auto space-y-6 flex-grow">
+        <!-- Placeholder instructions -->
+        <div id="track-initial-state" class="text-center py-10">
+          <div class="w-12 h-12 rounded-full bg-sky-50 text-sky-500 mx-auto flex items-center justify-center text-xl mb-3">
+            <i class="fa-solid fa-paper-plane"></i>
+          </div>
+          <p class="text-sm font-semibold text-slate-700">Enter your tracking code or email above</p>
+          <p class="text-xs text-slate-400 mt-1">Try demo code <span class="font-mono text-sky-600 font-bold">HK-74912</span> or <span class="font-mono text-sky-600 font-bold">HK-83941</span></p>
+        </div>
+
+        <!-- Rendered tracking cards -->
+        <div id="track-cards-list" class="space-y-6 hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. ADMIN: POST / EDIT JOB MODAL -->
+  <div id="modal-admin-job" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-fade-in border border-slate-200">
+      <!-- Header -->
+      <div class="p-5 bg-slate-50 border-b border-slate-200 flex items-start justify-between">
+        <div>
+          <h3 id="admin-job-modal-title" class="text-xl font-bold text-slate-900">Post New Job Opening</h3>
+          <p class="text-xs text-slate-500">Define role details, requirements, and compensation band.</p>
+        </div>
+        <button onclick="closeModal('modal-admin-job')" class="text-slate-400 hover:text-slate-600 transition p-1">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form id="form-admin-job" onsubmit="handleAdminJobSubmit(event)" class="p-6 overflow-y-auto space-y-4 text-xs">
+        <input type="hidden" id="admin-job-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Job Title <span class="text-rose-500">*</span></label>
+            <input type="text" id="admin-job-title" required placeholder="e.g. Senior Backend Engineer"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Department <span class="text-rose-500">*</span></label>
+            <input type="text" id="admin-job-dept" required placeholder="Engineering, Design, Marketing..."
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Location <span class="text-rose-500">*</span></label>
+            <input type="text" id="admin-job-location" required placeholder="e.g. Remote, Casablanca, London"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Work Type</label>
+            <select id="admin-job-work-type" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs">
+              <option value="Remote">Remote</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="On-site">On-site</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Employment Type</label>
+            <select id="admin-job-emp-type" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs">
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Internship">Internship</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Experience Level</label>
+            <select id="admin-job-exp-level" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs">
+              <option value="Entry Level">Entry Level</option>
+              <option value="Mid Level">Mid Level</option>
+              <option value="Senior Level">Senior Level</option>
+              <option value="Lead / Principal">Lead / Principal</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Min Salary</label>
+            <input type="number" id="admin-job-salary-min" placeholder="50000"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Max Salary & Currency</label>
+            <div class="flex gap-1.5">
+              <input type="number" id="admin-job-salary-max" placeholder="80000"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs">
+              <select id="admin-job-currency" class="px-2 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="MAD">MAD</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Application Deadline</label>
+            <input type="date" id="admin-job-deadline"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Posting Status</label>
+            <select id="admin-job-status" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs">
+              <option value="active">Active (Published)</option>
+              <option value="draft">Draft</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+          <div class="flex items-center pt-5">
+            <label class="inline-flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="admin-job-featured" class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300">
+              <span class="font-semibold text-slate-700">Feature this Job</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Role Description <span class="text-rose-500">*</span></label>
+          <textarea id="admin-job-desc" required rows="3" placeholder="Summary of the role and what the team does..."
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Responsibilities (One item per line)</label>
+          <textarea id="admin-job-responsibilities" rows="3" placeholder="Architect scalable APIs&#10;Lead sprint planning&#10;Mentor junior devs"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs font-mono"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Requirements & Qualifications (One item per line)</label>
+          <textarea id="admin-job-requirements" rows="3" placeholder="4+ years experience with Node.js&#10;Experience with Docker & PostgreSQL&#10;Great communicator"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs font-mono"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Perks & Benefits (One item per line)</label>
+          <textarea id="admin-job-benefits" rows="2" placeholder="Remote flexibility&#10;Health insurance&#10;Learning budget"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs font-mono"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modal-admin-job')" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold transition">
+            Cancel
+          </button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl btn-primary-blue font-semibold flex items-center gap-2">
+            <span id="btn-admin-job-text">Save Job Opening</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. ADMIN: CANDIDATE DETAIL & STATUS MODAL -->
+  <div id="modal-admin-candidate" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fade-in border border-slate-200">
+      <!-- Header -->
+      <div class="p-5 bg-slate-50 border-b border-slate-200 flex items-start justify-between">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span id="cand-status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-100 text-sky-800">
+              PENDING
+            </span>
+            <span id="cand-tracking-code" class="text-xs font-mono text-slate-500 font-semibold">HK-00000</span>
+          </div>
+          <h3 id="cand-name" class="text-xl font-bold text-slate-900">Candidate Name</h3>
+          <p id="cand-job-title" class="text-xs text-sky-700 font-medium"></p>
+        </div>
+        <button onclick="closeModal('modal-admin-candidate')" class="text-slate-400 hover:text-slate-600 transition p-1">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Candidate Content -->
+      <div class="p-6 overflow-y-auto space-y-5 text-xs text-slate-700">
+        <!-- Contact & Links Bar -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex flex-wrap items-center gap-4 text-xs">
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-envelope text-sky-500"></i> <a id="cand-email-link" class="text-sky-700 hover:underline"></a></span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-phone text-sky-500"></i> <span id="cand-phone"></span></span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-sky-500"></i> <span id="cand-location"></span></span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left text-sky-500"></i> <span id="cand-exp"></span> yrs exp</span>
+        </div>
+
+        <!-- Links & Resume -->
+        <div class="flex flex-wrap items-center gap-3">
+          <a id="cand-resume-btn" target="_blank" class="px-3.5 py-2 rounded-xl bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 font-semibold flex items-center gap-2 transition">
+            <i class="fa-solid fa-file-arrow-down text-base"></i> View / Download Resume
+          </a>
+          <a id="cand-linkedin" target="_blank" class="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium flex items-center gap-1.5 transition">
+            <i class="fa-brands fa-linkedin text-sky-600"></i> LinkedIn
+          </a>
+          <a id="cand-portfolio" target="_blank" class="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-globe text-slate-600"></i> Portfolio / GitHub
+          </a>
+        </div>
+
+        <!-- Cover Letter -->
+        <div>
+          <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider mb-1.5">Candidate Cover Letter / Note</h4>
+          <div id="cand-cover-letter" class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 leading-relaxed italic whitespace-pre-line">
+            No cover letter provided.
+          </div>
+        </div>
+
+        <!-- Status Changer & Stage Progress -->
+        <div class="bg-sky-50/50 p-4 rounded-xl border border-sky-200">
+          <h4 class="font-bold text-sky-900 text-xs uppercase tracking-wider mb-2">Update Application Stage</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Change Status To:</label>
+              <select id="cand-status-select" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-sky-500">
+                <option value="pending">Pending</option>
+                <option value="reviewing">Reviewing</option>
+                <option value="shortlisted">Shortlisted</option>
+                <option value="interview">Interview Scheduled</option>
+                <option value="offered">Offer Extended</option>
+                <option value="rejected">Rejected / Not Selected</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Status Update Note:</label>
+              <input type="text" id="cand-status-note" placeholder="e.g. Cleared tech screen, inviting to final"
+                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-sky-500">
+            </div>
+          </div>
+          <button onclick="handleCandidateStatusUpdate()" class="mt-3 px-4 py-2 rounded-xl btn-primary-blue text-xs font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-check"></i> Save Status Change
+          </button>
+        </div>
+
+        <!-- Recruiter Internal Notes & Rating -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Recruiter Assessment & Rating</h4>
+            <div class="flex items-center gap-1" id="cand-rating-stars">
+              <button onclick="setCandidateRating(1)" class="star-btn text-slate-300 hover:text-amber-400 text-sm"><i class="fa-solid fa-star"></i></button>
+              <button onclick="setCandidateRating(2)" class="star-btn text-slate-300 hover:text-amber-400 text-sm"><i class="fa-solid fa-star"></i></button>
+              <button onclick="setCandidateRating(3)" class="star-btn text-slate-300 hover:text-amber-400 text-sm"><i class="fa-solid fa-star"></i></button>
+              <button onclick="setCandidateRating(4)" class="star-btn text-slate-300 hover:text-amber-400 text-sm"><i class="fa-solid fa-star"></i></button>
+              <button onclick="setCandidateRating(5)" class="star-btn text-slate-300 hover:text-amber-400 text-sm"><i class="fa-solid fa-star"></i></button>
+            </div>
+          </div>
+          <textarea id="cand-notes-input" rows="3" placeholder="Private notes for HR & Hiring Managers (interview feedback, salary expectations, timeline)..."
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white text-xs"></textarea>
+          <div class="mt-2 flex justify-end">
+            <button onclick="saveCandidateNotes()" class="px-3.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition">
+              <i class="fa-solid fa-floppy-disk"></i> Save Internal Notes
+            </button>
+          </div>
+        </div>
+
+        <!-- Stage Timeline History -->
+        <div>
+          <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider mb-2">Stage Timeline History</h4>
+          <div id="cand-timeline" class="space-y-2 border-l-2 border-sky-200 pl-4 ml-2">
+            <!-- Rendered history -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end">
+        <button onclick="closeModal('modal-admin-candidate')" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-200 text-xs font-semibold transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-6 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded-lg bg-sky-600 text-white flex items-center justify-center text-xs">
+          <i class="fa-solid fa-briefcase"></i>
+        </div>
+        <span class="font-bold text-slate-800">Hikma JobTrack</span> &copy; 2026. All rights reserved.
+      </div>
+      <div class="flex items-center gap-4 text-slate-500">
+        <span>Primary Theme: Light Blue (#0284c7)</span>
+        <span>&bull;</span>
+        <button onclick="switchView('candidate')" class="hover:text-sky-600">Candidate View</button>
+        <span>&bull;</span>
+        <button onclick="switchView('admin')" class="hover:text-sky-600">Admin Portal</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
+
